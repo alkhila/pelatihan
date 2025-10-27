@@ -198,7 +198,7 @@ if ($is_logged_in && $user_role == 'admin') {
         </div>
       </section>
 
-      <section id="visi-misi" class="min-h-[70vh] p-16 bg-gray-100 flex items-center justify-center">
+      <section id="visi-misi" class="h-screen p-16 bg-gray-100 flex items-center justify-center">
         <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12">
           <div>
             <h2 class="text-4xl font-bold text-blue-900 mb-6 border-b-2 border-pink-500 pb-2">Visi Kami 🌟</h2>
@@ -220,7 +220,7 @@ if ($is_logged_in && $user_role == 'admin') {
         </div>
       </section>
 
-      <section id="produk-kami" class="min-h-screen p-16 bg-white">
+      <section id="produk-kami" class="h-screen p-16 bg-white">
         <h2
           class="text-5xl font-bold text-center mb-16 text-blue-900 border-b-4 border-pink-500 inline-block mx-auto pb-2">
           Signature Jeju: Produk Unggulan 🍊
@@ -265,7 +265,7 @@ if ($is_logged_in && $user_role == 'admin') {
         <a href="produk_kami.php">Lihat produk dan pesan -></a>
       </section>
 
-      <section id="kontak" class="min-h-screen p-16 bg-gray-100">
+      <section id="kontak" class="h-screen p-16 bg-gray-100">
         <h2
           class="text-5xl font-bold text-center mb-16 text-blue-900 border-b-4 border-pink-500 inline-block mx-auto pb-2">
           Lokasi Kami di Pulau Jeju ⛰️</h2>
@@ -289,7 +289,7 @@ if ($is_logged_in && $user_role == 'admin') {
         </div>
       </section>
 
-      <section id="about-us" class="min-h-[60vh] p-16 bg-white flex items-center">
+      <section id="about-us" class="h-screen p-16 bg-white flex items-center">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 max-w-7xl mx-auto">
           <div class="lg:col-span-1">
             <img src="../img/logo.png" alt="Patung Dolhareubang" class="rounded-xl shadow-lg w-full h-auto">
@@ -310,7 +310,7 @@ if ($is_logged_in && $user_role == 'admin') {
         </div>
       </section>
 
-      <section id="klien" class="min-h-[50vh] p-16 bg-gray-50">
+      <section id="klien" class="h-screen p-16 bg-gray-50">
         <h2
           class="text-5xl font-bold text-center mb-16 text-blue-900 border-b-4 border-pink-500 inline-block mx-auto pb-2">
           Mitra & Klien Kami 🤝
@@ -381,16 +381,13 @@ if ($is_logged_in && $user_role == 'admin') {
 
         const targetId = this.getAttribute('href');
         const targetElement = document.querySelector(targetId);
-        const navBar = document.querySelector('.navbar');
 
         if (targetElement) {
-          const navHeight = navBar.offsetHeight;
-          // Hitung posisi yang benar: Posisi Element + Scroll Saat Ini - Tinggi Navbar
-          const targetPosition = targetElement.getBoundingClientRect().top + window.scrollY - navHeight;
-
-          window.scrollTo({
-            top: targetPosition,
-            behavior: 'smooth'
+          // Gunakan scrollIntoView standar (browser akan handle smooth scroll)
+          // Karena CSS trick sudah mengatur offset, kita tidak perlu perhitungan kompleks di JS
+          targetElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
           });
         }
       });
