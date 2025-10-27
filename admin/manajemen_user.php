@@ -2,16 +2,17 @@
 include '../config/config.php';
 session_start();
 
-// --- PENGAMANAN KHUSUS ADMIN (TIDAK BERUBAH) ---
+// --- PENGAMANAN KHUSUS ADMIN ---
 if (!isset($_SESSION['status']) || $_SESSION['status'] != "login" || $_SESSION['role'] != 'admin') {
   header("location:../login.php?pesan=akses_ditolak");
-  exit();
+  exit(); // Hentikan script jika tidak valid
 }
 
 $current_admin_id = $_SESSION['id'];
 $admin_name = $_SESSION['username'];
 $pesan = "";
 
+// Baris 16
 // --- LOGIKA HAPUS USER ---
 if (isset($_GET['hapus'])) {
   $id_hapus = mysqli_real_escape_string($konek, $_GET['hapus']);
@@ -51,8 +52,9 @@ if (isset($_POST['ubah_role'])) {
   exit();
 }
 
-// --- LOGIKA READ USER (PERBAIKAN: Tampilkan SEMUA user) ---
-// Hapus klausa WHERE id != '$current_admin_id'
+// ... (Lanjutan kode READ USER di bawah ini) ...
+
+// --- LOGIKA READ USER ---
 $query = "SELECT id, name, email, role FROM users ORDER BY role DESC, name";
 $data_users = mysqli_query($konek, $query);
 ?>
@@ -262,6 +264,22 @@ $data_users = mysqli_query($konek, $query);
       </tbody>
     </table>
   </div>
+
+  <script>
+    // Logic Logout Confirmation
+    const logoutBtn = document.getElementById('logoutButton');
+
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', function (e) {
+        const konfirmasi = confirm("Anda yakin ingin keluar (Logout)?");
+
+        if (konfirmasi) {
+          // Path ke logout.php harus keluar dari folder admin
+          window.location.href = '../logout.php';
+        }
+      });
+    }
+  </script>
 </body>
 
 </html>

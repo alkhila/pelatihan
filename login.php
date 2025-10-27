@@ -4,7 +4,7 @@ session_start();
 
 $error = "";
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] == 'POST') { // login baru dijalankan stlh submit ditekan
   $usn_input = mysqli_real_escape_string($konek, $_POST['usn']);
   $pass_input = $_POST['pass'];
 

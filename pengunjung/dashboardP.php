@@ -260,6 +260,9 @@ if ($is_logged_in && $user_role == 'admin') {
             </ul>
           </div>
         </div>
+        <br> <br>
+        <!-- opsional -->
+        <a href="produk_kami.php">Lihat produk dan pesan -></a>
       </section>
 
       <section id="kontak" class="min-h-screen p-16 bg-gray-100">
