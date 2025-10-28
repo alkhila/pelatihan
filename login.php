@@ -3,12 +3,16 @@ include "config/config.php";
 session_start();
 
 $error = "";
+$success_message = "";
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') { // login baru dijalankan stlh submit ditekan
+if (isset($_GET['pesan']) && $_GET['pesan'] == 'registrasi_sukses') {
+  $success_message = "🎉 Registrasi berhasil! Silakan masuk dengan akun Anda.";
+}
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   $usn_input = mysqli_real_escape_string($konek, $_POST['usn']);
   $pass_input = $_POST['pass'];
 
-  // --- PERUBAHAN: SELECT kolom 'role' juga ---
   $query = "SELECT id, name, password_hash, role FROM users WHERE name='$usn_input'";
   $login_result = mysqli_query($konek, $query) or die(mysqli_error($konek));
 
@@ -19,35 +23,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') { // login baru dijalankan stlh submit
     $hashed_password_dari_db = $data['password_hash'];
 
     if (password_verify($pass_input, $hashed_password_dari_db)) {
-      // Login Berhasil
-
-      // --- SIMPAN ROLE KE SESSION ---
+      $_SESSION['alert_message'] = "Selamat datang, " . $data['name'] . "! Anda berhasil login.";
       $_SESSION['id'] = $data['id'];
       $_SESSION['username'] = $data['name'];
-      $_SESSION['role'] = $data['role']; // <-- INI YANG BARU
+      $_SESSION['role'] = $data['role'];
       $_SESSION['status'] = "login";
 
-      // --- LOGIKA REDIRECT BERDASARKAN ROLE ---
       if ($data['role'] == 'admin') {
-        header("location: admin/dashboard.php"); // Arahkan ke folder admin
+        header("location: admin/dashboard.php");
       } else {
-        header("location: pengunjung/dashboardP.php"); // Arahkan ke halaman pengunjung
+        header("location: pengunjung/dashboardP.php");
       }
       exit();
+
     } else {
       $error = "Username atau password salah!";
     }
   } else {
     $error = "Username atau password salah!";
-  }
-
-  $_SESSION['role'] = $data['role']; // Nilai: 'admin' atau 'pengunjung'
-  $_SESSION['status'] = "login";
-
-  if ($data['role'] == 'admin') {
-    header("location: admin/dashboard.php"); // Redirect ke folder Admin
-  } else {
-    header("location: pengunjung/dashboardP.php"); // Redirect ke halaman Pengunjung
   }
 }
 ?>
@@ -113,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') { // login baru dijalankan stlh submit
     }
 
     input:focus {
-      border-color: #8A70D6;
+      border-color: #11224E;
       outline: none;
       box-shadow: 0 0 0 0.25rem rgba(138, 112, 214, 0.25);
     }
@@ -125,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') { // login baru dijalankan stlh submit
     }
 
     .form-footer a {
-      color: #c084fc;
+      color: #11224E;
       text-decoration: none;
       font-weight: bold;
     }
@@ -137,7 +130,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') { // login baru dijalankan stlh submit
       border-radius: 8px;
       font-size: 16px;
       color: white;
-      background-color: #c084fc;
+      background-color: #11224E;
       cursor: pointer;
       margin-bottom: 12px;
       margin-left: 30px;
@@ -145,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') { // login baru dijalankan stlh submit
     }
 
     .btn:hover {
-      background-color: #a855f7;
+      background-color: #0f1f48ff;
     }
 
     .image-section {
@@ -153,13 +146,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') { // login baru dijalankan stlh submit
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #f8f8f8;
+      background: #EEEEEE;
       padding: 20px;
     }
 
     .image-section img {
       width: 100%;
       max-width: 400px;
+    }
+
+    h1 {
+      color: #11224E;
     }
   </style>
 </head>
@@ -169,6 +166,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') { // login baru dijalankan stlh submit
     <div class="form-section">
       <form action="" method="post">
         <h1>LOGIN</h1> <br>
+        <?php if (!empty($error)): ?>
+          <div id="errorAlert" style="margin-left: 30px;">
+            <p class="error-message">⚠️ <?php echo $error; ?></p>
+          </div>
+        <?php endif; ?>
         <div class="form-group">
           <label for="username">Username</label>
           <input type="text" name="usn">
@@ -181,12 +183,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') { // login baru dijalankan stlh submit
           Belum punya akun? <a href="registrasi.php">Daftar</a>
         </div>
         <button class="btn" type="submit">Log In</button>
-      </form>
     </div>
     <div class="image-section">
       <img src="img/logo.png">
     </div>
   </div>
+
+  <script>
+    const errorAlert = document.getElementById('errorAlert');
+
+    if (errorAlert) {
+      setTimeout(() => {
+        errorAlert.style.opacity = '0';
+
+        setTimeout(() => {
+          errorAlert.style.display = 'none';
+        }, 500);
+
+      }, 4000);
+    }
+  </script>
 </body>
 
 </html>

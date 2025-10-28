@@ -1,25 +1,16 @@
 <?php
-// pengunjung/dashboardP.php
 session_start();
 
-// Cek status login
 $is_logged_in = isset($_SESSION['status']) && $_SESSION['status'] == "login";
 
-// PENTING: Ambil username secara aman
 $username = $_SESSION['username'] ?? '';
 
-// --- PERBAIKAN DI SINI ---
-// Ambil role secara aman. Jika $_SESSION['role'] belum diset, gunakan default 'pengunjung'.
 $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : 'pengunjung';
 
-// --- LOGIKA REDIRECT YANG BENAR ---
-// Kondisi 1: Jika user sudah login DAN role-nya adalah ADMIN, alihkan ke dashboard admin.
 if ($is_logged_in && $user_role == 'admin') {
   header("location: ../admin/dashboard.php");
   exit();
 }
-// Kondisi 2 (Implicit): Jika bukan admin (yaitu Pengunjung yang login atau Anonim),
-// biarkan sisa script (HTML) berjalan.
 ?>
 
 <!DOCTYPE html>
@@ -28,13 +19,12 @@ if ($is_logged_in && $user_role == 'admin') {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Event Gallery | DolceVita Cafe</title>
+  <title>Event Gallery | Dolhareubang Cafe</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
   <style>
-    /* CSS DARI DASHBOARDP.PHP */
     html,
     body {
       margin: 0;
@@ -45,7 +35,7 @@ if ($is_logged_in && $user_role == 'admin') {
     }
 
     #sidebar {
-      background-color: #1e3a8a;
+      background-color: #11224E;
       color: white;
       height: 100vh;
       min-height: 100vh;
@@ -68,7 +58,7 @@ if ($is_logged_in && $user_role == 'admin') {
     }
 
     .navbar {
-      background-color: #1e3a8a;
+      background-color: #11224E;
       color: white;
       display: flex;
       justify-content: space-between;
@@ -107,13 +97,12 @@ if ($is_logged_in && $user_role == 'admin') {
       text-align: center;
       font-size: 3rem;
       font-weight: bold;
-      color: white;
+      color: #11224E;
       margin-bottom: 50px;
     }
 
-    /* CSS KHUSUS EVENT GALLERY (Dark Theme) */
     main {
-      background-color: #0d1117;
+      background-color: white;
       padding: 40px 20px;
     }
 
@@ -192,7 +181,7 @@ if ($is_logged_in && $user_role == 'admin') {
 <body class="bg-gray-100 flex">
 
   <div id="sidebar" class="bg-blue-900 text-white w-64 h-screen flex flex-col fixed z-20">
-    <div class="flex items-center justify-between p-4 border-b border-blue-800">
+    <div class="flex items-center justify-between p-4">
       <button id="toggleSidebar"
         style="display: flex; align-items: center; gap: 8px; border: none; background: none; color: inherit;">
         <img src="../img/logo.png" alt="Logo" style="width: 32px; height: 32px; border-radius: 50%;" />
@@ -336,18 +325,15 @@ if ($is_logged_in && $user_role == 'admin') {
   </div>
 
   <script>
-    // Ambil elemen untuk manipulasi
     const toggleSidebar = document.getElementById("toggleSidebar");
     const sidebar = document.getElementById("sidebar");
     const logoText = document.getElementById("logoText");
     const sidebarTexts = document.querySelectorAll(".sidebar-text");
     const mainContentContainer = document.getElementById("main-content-container");
 
-    // Tentukan nilai lebar (w-64 = 256px, w-20 = 80px)
     const lebarSidebarTerbuka = '256px';
     const lebarSidebarTertutup = '80px';
 
-    // Atur margin awal main content agar tidak tertutup sidebar
     mainContentContainer.style.marginLeft = lebarSidebarTerbuka;
 
     // 1. Logic Toggle Sidebar (Diikat ke tombol di sidebar)
@@ -366,9 +352,6 @@ if ($is_logged_in && $user_role == 'admin') {
         sidebarTexts.forEach((text) => text.classList.toggle("hidden"));
       });
     }
-
-    // 2. Logic Scroll Navigation (Link di halaman ini diarahkan ke halaman lain)
-    // Dibiarkan tanpa smooth scroll, link akan berfungsi sebagai navigasi antar halaman/section
 
     // 3. Logic Logout Confirmation (untuk tombol di Sidebar dan Navbar)
     const handleLogout = () => {

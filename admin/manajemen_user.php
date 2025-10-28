@@ -52,8 +52,6 @@ if (isset($_POST['ubah_role'])) {
   exit();
 }
 
-// ... (Lanjutan kode READ USER di bawah ini) ...
-
 // --- LOGIKA READ USER ---
 $query = "SELECT id, name, email, role FROM users ORDER BY role DESC, name";
 $data_users = mysqli_query($konek, $query);
@@ -64,11 +62,11 @@ $data_users = mysqli_query($konek, $query);
 
 <head>
   <meta charset="UTF-8">
-  <title>Manajemen Pengguna</title>
+  <title>Manajemen Pengguna | Dolhareubang</title>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
   <style>
     .navbar {
-      background-color: #1e3a8a;
+      background-color: #11224E;
       /* blue-900 */
       color: white;
       display: flex;
@@ -152,7 +150,7 @@ $data_users = mysqli_query($konek, $query);
     }
 
     .btn-action {
-      background-color: #2563eb;
+      background-color: #11224E;
       color: white;
       padding: 6px 12px;
       border-radius: 4px;
@@ -210,8 +208,14 @@ $data_users = mysqli_query($konek, $query);
     <h1 class="page-title">Manajemen Pengguna</h1>
 
     <?php
-    if (isset($_GET['pesan'])) {
-      echo "<p style='color: green; font-weight: bold; margin-top: 15px;'>" . htmlspecialchars($_GET['pesan']) . "</p>";
+    if (isset($_GET['pesan']) && $_GET['pesan'] != '') {
+      // Styling untuk pesan sukses/warning (asumsi warna hijau/merah)
+      $msg = htmlspecialchars($_GET['pesan']);
+      $color = (strpos($msg, 'gagal') !== false || strpos($msg, 'tidak bisa') !== false) ? 'red' : 'green';
+
+      echo '<div id="statusMessage" style="background-color: #d1fae5; border: 1px solid #10b981; color: #065f46; padding: 12px; margin-top: 15px; margin-bottom: 15px; border-radius: 5px; opacity: 1; transition: opacity 0.5s ease;">';
+      echo '<p style="font-weight: bold;">' . $msg . '</p>';
+      echo '</div>';
     }
     ?>
 
@@ -278,6 +282,23 @@ $data_users = mysqli_query($konek, $query);
           window.location.href = '../logout.php';
         }
       });
+    }
+
+    // --- FUNGSI TIMER UNTUK NOTIFIKASI ---
+    const statusMessage = document.getElementById('statusMessage');
+
+    if (statusMessage) {
+      // Durasi tampilan: 4000 milidetik (4 detik)
+      setTimeout(() => {
+        // Memulai transisi fade out (membuat opacity jadi 0)
+        statusMessage.style.opacity = '0';
+
+        // Setelah transisi (0.5 detik), sembunyikan sepenuhnya
+        setTimeout(() => {
+          statusMessage.style.display = 'none';
+        }, 500);
+
+      }, 4000); // Pesan akan menghilang setelah 4 detik
     }
   </script>
 </body>

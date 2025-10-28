@@ -8,35 +8,36 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   $pass = $_POST['pass'];
   $repass = $_POST['repass'];
 
-  // 1. Cek kecocokan password (Logic ini sudah Anda kerjakan sebelumnya)
   if ($pass !== $repass) {
     $error = "Password tidak cocok.";
     goto end_script;
   }
 
-  // 2. Hash Password (Wajib)
+  $query_check = "SELECT email FROM users WHERE email = '$email'";
+  $result_check = mysqli_query($konek, $query_check);
+
+  if (mysqli_num_rows($result_check) > 0) {
+    $error = "Email ini sudah terdaftar. Silakan gunakan email lain atau Login.";
+    goto end_script;
+  }
+
   $hashed_password = password_hash($pass, PASSWORD_DEFAULT);
 
-  // 3. Set Role Default
-  $default_role = 'pengunjung'; // Semua registrasi baru adalah 'pengunjung'
+  $default_role = 'pengunjung';
 
-  // --- PERBAIKAN UTAMA DI SINI (Baris 23 yang bermasalah) ---
-  // Menyebutkan nama kolom secara eksplisit dan menyediakan 5 nilai
   $query = "INSERT INTO users (name, email, password_hash, role) 
               VALUES ('$usn', '$email', '$hashed_password', '$default_role')";
 
   $regis = mysqli_query($konek, $query);
 
   if ($regis) {
-    // Jika registrasi berhasil
     header("location: login.php?pesan=registrasi_sukses");
     exit();
   } else {
-    // Jika gagal (misal: duplikasi email/username)
     $error = "Registrasi gagal: " . mysqli_error($konek);
   }
 }
-end_script: // Label untuk goto jika password tidak cocok
+end_script:
 ?>
 
 <!DOCTYPE html>
@@ -99,7 +100,7 @@ end_script: // Label untuk goto jika password tidak cocok
     }
 
     input:focus {
-      border-color: #8A70D6;
+      border-color: #11224E;
       outline: none;
       box-shadow: 0 0 0 0.25rem rgba(138, 112, 214, 0.25);
     }
@@ -111,7 +112,7 @@ end_script: // Label untuk goto jika password tidak cocok
     }
 
     .form-footer a {
-      color: #c084fc;
+      color: #11224E;
       text-decoration: none;
       font-weight: bold;
     }
@@ -123,7 +124,7 @@ end_script: // Label untuk goto jika password tidak cocok
       border-radius: 8px;
       font-size: 16px;
       color: white;
-      background-color: #c084fc;
+      background-color: #11224E;
       cursor: pointer;
       margin-bottom: 12px;
       margin-left: 30px;
@@ -131,7 +132,7 @@ end_script: // Label untuk goto jika password tidak cocok
     }
 
     .btn:hover {
-      background-color: #a855f7;
+      background-color: #0f1f48ff;
     }
 
     .image-section {
@@ -146,6 +147,10 @@ end_script: // Label untuk goto jika password tidak cocok
     .image-section img {
       width: 100%;
       max-width: 400px;
+    }
+
+    h1 {
+      color: #11224E;
     }
   </style>
 </head>

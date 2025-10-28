@@ -1,19 +1,13 @@
 <?php
-// detail_artikel.php
-// Asumsi: File ini ada di folder 'pengunjung/'
-// TIDAK ADA session_start() di sini karena ini adalah halaman publik
-include '../config/config.php'; // Sesuaikan path ke config.php Anda
+include '../config/config.php';
 
-// --- 1. AMBIL ID DARI URL ---
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
-  // Alihkan jika ID tidak ada atau tidak valid
   header("Location: artikelP.php?pesan=Artikel_tidak_ditemukan");
   exit();
 }
 
 $article_id = mysqli_real_escape_string($konek, $_GET['id']);
 
-// --- 2. QUERY MENGAMBIL DATA LENGKAP ARTIKEL ---
 $query = "SELECT a.*, u.name AS author_name, u.email AS author_email 
           FROM articles a
           JOIN users u ON a.admin_id = u.id 
@@ -22,15 +16,13 @@ $query = "SELECT a.*, u.name AS author_name, u.email AS author_email
 $result = mysqli_query($konek, $query);
 $article = mysqli_fetch_assoc($result);
 
-// Jika artikel tidak ditemukan di DB
 if (!$article) {
   header("Location: artikelP.php?pesan=Artikel_tidak_ditemukan");
   exit();
 }
 
-// Format Tanggal
 $published_date = date('d M Y, H:i', strtotime($article['published_at']));
-$image_path = '../admin/' . $article['photo']; // Sesuaikan path gambar dari folder admin
+$image_path = '../admin/' . $article['photo'];
 ?>
 
 <!DOCTYPE html>
@@ -46,7 +38,7 @@ $image_path = '../admin/' . $article['photo']; // Sesuaikan path gambar dari fol
     body {
       font-family: sans-serif;
       background-color: #f3f4f6;
-      color: #1f2937;
+      color: #11224E;
       margin: 0;
       padding: 0;
     }
@@ -72,7 +64,7 @@ $image_path = '../admin/' . $article['photo']; // Sesuaikan path gambar dari fol
       font-size: 2.5rem;
       font-weight: 800;
       margin-bottom: 15px;
-      color: #1e3a8a;
+      color: #11224E;
     }
 
     .article-metadata {
@@ -96,7 +88,7 @@ $image_path = '../admin/' . $article['photo']; // Sesuaikan path gambar dari fol
     .back-link {
       display: inline-block;
       margin-bottom: 20px;
-      color: #2563eb;
+      color: #0c193bff;
       text-decoration: none;
       font-weight: bold;
     }

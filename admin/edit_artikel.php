@@ -152,7 +152,7 @@ end_script_update:
     }
 
     .btn-submit {
-      background-color: #2563eb;
+      background-color: #11224E;
       color: white;
       font-weight: bold;
       padding: 10px 20px;
@@ -163,7 +163,7 @@ end_script_update:
     }
 
     .btn-submit:hover {
-      background-color: #1d4ed8;
+      background-color: #11224E;
     }
 
     .btn-batal {

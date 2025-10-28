@@ -2,27 +2,24 @@
 include '../config/config.php';
 session_start();
 
-// Pemeriksaan Sesi
 if (!isset($_SESSION['status']) || $_SESSION['status'] != "login" || $_SESSION['role'] != 'admin') {
   header("location:../login.php?pesan=akses_ditolak");
-  exit(); // Hentikan script jika tidak valid
+  exit();
 }
 
-// Ambil nama user
-$admin_name = $_SESSION['username'];
+$current_admin_id = $_SESSION['id'] ?? 0;
+$admin_name = $_SESSION['username'] ?? 'Admin';
+$pesan = "";
 
-// LOGIKA HAPUS
 if (isset($_GET['hapus'])) {
-  // Tetap amankan variabel ID dari SQL Injection (sangat penting!)
   $id = mysqli_real_escape_string($konek, $_GET['hapus']);
 
-  // Hapus gambar unggulan dari server terlebih dahulu (jika ada)
   $q_img = mysqli_query($konek, "SELECT photo FROM articles WHERE id='$id'");
   $data_img = mysqli_fetch_assoc($q_img);
   $path_gambar = $data_img['photo'] ?? '';
 
   if (!empty($path_gambar) && file_exists($path_gambar)) {
-    unlink($path_gambar); // Hapus file gambar
+    unlink($path_gambar);
   }
 
   $hapus = mysqli_query($konek, "DELETE FROM articles WHERE id='$id'");
@@ -31,16 +28,31 @@ if (isset($_GET['hapus'])) {
     header("location: artikel.php?pesan=Artikel berhasil dihapus.");
     exit();
   } else {
-    die("Gagal menghapus data: " . mysqli_error($konek));
+    $error_message = "Gagal menghapus data: " . mysqli_error($konek);
+    header("location: artikel.php?pesan=" . urlencode($error_message));
+    exit();
   }
 }
 
-// LOGIKA NOTIFIKASI DARI SESSION
 $pesan_notifikasi = '';
+$is_error = false;
+
 if (isset($_SESSION['notifikasi_pesan'])) {
   $pesan_notifikasi = $_SESSION['notifikasi_pesan'];
   unset($_SESSION['notifikasi_pesan']);
+} elseif (isset($_GET['pesan'])) {
+  $pesan_notifikasi = urldecode($_GET['pesan']);
+  if (
+    strpos(strtolower($pesan_notifikasi), 'gagal') !== false ||
+    strpos(strtolower($pesan_notifikasi), 'tidak bisa') !== false ||
+    strpos(strtolower($pesan_notifikasi), 'error') !== false
+  ) {
+    $is_error = true;
+  }
 }
+
+$query = "SELECT id, title, category, content, published_at FROM articles ORDER BY published_at DESC";
+$data_artikel = mysqli_query($konek, $query);
 ?>
 
 <!DOCTYPE html>
@@ -54,33 +66,26 @@ if (isset($_SESSION['notifikasi_pesan'])) {
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
   <style>
-    /* BODY */
     body {
       background-color: #f3f4f6;
       font-family: sans-serif;
       margin: 0;
-      /* Hapus margin default browser */
     }
 
-    /* UTILITY */
-    /* Wrapper baru untuk konten agar terpusat */
     .content-area-wrapper {
       max-width: 1200px;
       margin-left: auto;
-      /* Pusatkan konten */
       margin-right: auto;
       padding: 32px 48px;
     }
 
-    /* NAVBAR */
     .navbar {
-      background-color: #1e3a8a;
-      /* blue-900 */
+      background-color: #11224E;
       color: white;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 22px 24px;
+      padding: 12px 24px;
       position: sticky;
       top: 0;
       z-index: 10;
@@ -91,7 +96,6 @@ if (isset($_SESSION['notifikasi_pesan'])) {
       display: flex;
       align-items: center;
       gap: 32px;
-      /* Jarak antara logo dan menu */
     }
 
     .nav-link {
@@ -109,27 +113,18 @@ if (isset($_SESSION['notifikasi_pesan'])) {
       background-color: rgba(255, 255, 255, 0.1);
     }
 
-    .nav-profile-img {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-    }
-
-    /* HEADER & ALERT */
     .page-title {
       font-size: 24px;
       font-weight: bold;
-      color: #1f2937;
+      color: #11224E;
       margin-bottom: 24px;
       padding-bottom: 8px;
-      /* Pusatkan judul di dalam content-area-wrapper */
       text-align: center;
+      border-bottom: 2px solid #e5e7eb;
     }
 
-    .alert-success {
-      background-color: #d1fae5;
-      border-left: 4px solid #10b981;
-      color: #065f46;
+    .alert-success,
+    .alert-error {
       padding: 16px;
       margin-bottom: 16px;
       border-radius: 4px;
@@ -137,9 +132,20 @@ if (isset($_SESSION['notifikasi_pesan'])) {
       transition: opacity 0.5s ease-out;
     }
 
-    /* BUTTON */
+    .alert-success {
+      background-color: #d1fae5;
+      border-left: 4px solid #10b981;
+      color: #065f46;
+    }
+
+    .alert-error {
+      background-color: #fee2e2;
+      border-left: 4px solid #ef4444;
+      color: #b91c1c;
+    }
+
     .btn-add {
-      background-color: #2563eb;
+      background-color: #11224E;
       color: white;
       font-weight: bold;
       padding: 8px 16px;
@@ -151,25 +157,21 @@ if (isset($_SESSION['notifikasi_pesan'])) {
       transition: background-color 0.15s;
     }
 
-    .btn-add .material-icons {
-      margin-right: 8px;
-      font-size: 20px;
+    .btn-add:hover {
+      background-color: #0c1a38;
     }
 
-    /* TABLE CONTAINER (Card) */
     .table-container {
       background-color: white;
       border-radius: 12px;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
       padding: 24px;
-      /* Padding di dalam card */
     }
 
     .table-wrapper {
       overflow-x: auto;
     }
 
-    /* TABLE STYLES */
     .data-table {
       min-width: 100%;
       border-collapse: collapse;
@@ -198,30 +200,9 @@ if (isset($_SESSION['notifikasi_pesan'])) {
       white-space: nowrap;
     }
 
-    /* ... (Sisa styling tabel tetap sama) ... */
-    .td-title {
-      font-weight: 500;
-      max-width: 300px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
     .td-category {
-      color: #2563eb;
+      color: #11224E;
       font-weight: 600;
-    }
-
-    .td-content {
-      color: #6b7280;
-      max-width: 400px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .action-link {
-      text-align: center;
     }
 
     .action-link a.edit {
@@ -237,17 +218,10 @@ if (isset($_SESSION['notifikasi_pesan'])) {
       font-size: 20px;
       vertical-align: middle;
     }
-
-    .no-data {
-      padding: 40px;
-      text-align: center;
-      color: #6b7280;
-      font-size: 18px;
-    }
   </style>
 </head>
 
-<body>
+<body class="bg-gray-100">
 
   <nav class="navbar">
     <div class="navbar-brand-wrapper">
@@ -272,14 +246,12 @@ if (isset($_SESSION['notifikasi_pesan'])) {
   </nav>
 
   <div class="content-area-wrapper">
-
     <h1 class="page-title">Manajemen Artikel</h1>
-
     <?php
-    // Tampilkan pesan jika ada
     if (!empty($pesan_notifikasi)) {
-      echo '<div class="alert-success" id="successAlert">
-                    <p>' . $pesan_notifikasi . '</p>
+      $alert_class = $is_error ? 'alert-error' : 'alert-success';
+      echo '<div class="' . $alert_class . '" id="statusAlert">
+                    <p>' . htmlspecialchars($pesan_notifikasi) . '</p>
                   </div>';
     }
     ?>
@@ -305,10 +277,8 @@ if (isset($_SESSION['notifikasi_pesan'])) {
           </thead>
           <tbody class="table-body">
             <?php
-            $tampil = mysqli_query($konek, "SELECT id, title, category, content, published_at FROM articles ORDER BY published_at DESC");
-
-            if (mysqli_num_rows($tampil) > 0):
-              while ($data = mysqli_fetch_array($tampil)) { ?>
+            if (mysqli_num_rows($data_artikel) > 0):
+              while ($data = mysqli_fetch_array($data_artikel)) { ?>
                 <tr>
                   <td><?php echo $data['id']; ?></td>
                   <td class="td-title"><?php echo $data['title']; ?></td>
@@ -340,7 +310,7 @@ if (isset($_SESSION['notifikasi_pesan'])) {
   </div>
 
   <script>
-    const alertElement = document.getElementById('successAlert');
+    const alertElement = document.getElementById('statusAlert');
 
     if (alertElement) {
       setTimeout(() => {
@@ -350,20 +320,16 @@ if (isset($_SESSION['notifikasi_pesan'])) {
           alertElement.style.display = 'none';
         }, 500);
 
-      }, 3000); // 3 detik
+      }, 3000);
     }
 
-    // --- SCRIPT LOGOUT KONFIRMASI ---
     const logoutBtn = document.getElementById('logoutButton');
 
     if (logoutBtn) {
       logoutBtn.addEventListener('click', function (e) {
-        // Tampilkan popup konfirmasi
         const konfirmasi = confirm("Anda yakin ingin keluar (Logout)?");
 
         if (konfirmasi) {
-          // Jika user menekan 'OK', arahkan ke logout.php
-          // Sesuaikan path ke logout.php jika berbeda
           window.location.href = '../logout.php';
         }
       });

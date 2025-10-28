@@ -1,25 +1,17 @@
 <?php
-// artikelP.php (Halaman Artikel Pengunjung)
-include '../config/config.php'; // Ganti dengan path yang benar ke config.php Anda
+include '../config/config.php';
 session_start();
 
-// Cek status login (untuk kondisional di HTML)
 $is_logged_in = isset($_SESSION['status']) && $_SESSION['status'] == "login";
 
-// PENTING: Ambil username dan role secara aman menggunakan null coalescing
-// Jika session tidak ada/kosong, nilainya akan menjadi '' atau 'pengunjung'.
 $username = $_SESSION['username'] ?? '';
 $user_role = $_SESSION['role'] ?? 'pengunjung';
 
-// --- LOGIKA REDIRECT ADMIN ---
-// Jika user sudah login dan dia adalah ADMIN, redirect ke folder admin.
 if ($is_logged_in && $user_role == 'admin') {
   header("location: ../admin/dashboard.php");
   exit();
 }
-// Tidak ada pengecekan wajib login di sini. Pengunjung Anonim boleh melihat sisa halaman.
 
-// --- LOGIKA MENGAMBIL DATA ARTIKEL DARI DATABASE (TIDAK BERUBAH) ---
 $query = "SELECT a.id, a.title, a.content, a.category, a.photo, a.published_at, u.name AS author_name 
           FROM articles a
           JOIN users u ON a.admin_id = u.id 
@@ -40,12 +32,11 @@ if ($artikel_result) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Blog DolceVita Cafe</title>
+  <title>Dolhareubang Cafe</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <style>
-    /* CSS DARI DASHBOARDP.PHP */
     html,
     body {
       margin: 0;
@@ -56,7 +47,7 @@ if ($artikel_result) {
     }
 
     #sidebar {
-      background-color: #1e3a8a;
+      background-color: #11224E;
       color: white;
       height: 100vh;
       min-height: 100vh;
@@ -79,7 +70,7 @@ if ($artikel_result) {
     }
 
     .navbar {
-      background-color: #1e3a8a;
+      background-color: #11224E;
       color: white;
       display: flex;
       justify-content: space-between;
@@ -114,9 +105,8 @@ if ($artikel_result) {
       gap: 32px;
     }
 
-    /* CSS KHUSUS ARTIKEL */
     body {
-      background-color: #0d1117;
+      background-color: white;
       padding: 0;
     }
 
@@ -124,12 +114,11 @@ if ($artikel_result) {
       padding: 40px 20px;
     }
 
-    /* Tambahkan padding di main content */
     .page-title {
       text-align: center;
       font-size: 3rem;
       font-weight: bold;
-      color: white;
+      color: #11224E;
       margin-bottom: 50px;
     }
 
@@ -237,7 +226,7 @@ if ($artikel_result) {
 <body>
 
   <div id="sidebar" class="bg-blue-900 text-white w-64 h-screen flex flex-col fixed z-20">
-    <div class="flex items-center justify-between p-4 border-b border-blue-800">
+    <div class="flex items-center justify-between p-4">
       <button id="toggleSidebar"
         style="display: flex; align-items: center; gap: 8px; border: none; background: none; color: inherit;">
         <img src="../img/logo.png" alt="Logo" style="width: 32px; height: 32px; border-radius: 50%;" />
@@ -295,7 +284,6 @@ if ($artikel_result) {
           $excerpt = substr($full_content, 0, 150) . (strlen($full_content) > 150 ? '...' : '');
           $date = date('M d, Y', strtotime($article['published_at']));
 
-          // Path Gambar: Asumsi uploads/artikel ada di admin/
           $image_path = '../admin/' . $article['photo'];
           ?>
 
@@ -328,18 +316,15 @@ if ($artikel_result) {
   </div>
 
   <script>
-    // Ambil elemen untuk manipulasi
     const toggleSidebar = document.getElementById("toggleSidebar");
     const sidebar = document.getElementById("sidebar");
     const logoText = document.getElementById("logoText");
     const sidebarTexts = document.querySelectorAll(".sidebar-text");
     const mainContentContainer = document.getElementById("main-content-container");
 
-    // Tentukan nilai lebar (w-64 = 256px, w-20 = 80px)
     const lebarSidebarTerbuka = '256px';
     const lebarSidebarTertutup = '80px';
 
-    // Atur margin awal main content agar tidak tertutup sidebar
     mainContentContainer.style.marginLeft = lebarSidebarTerbuka;
 
     // 1. Logic Toggle Sidebar (Diikat ke tombol di sidebar)
@@ -360,15 +345,8 @@ if ($artikel_result) {
     }
 
     // 2. Logic Scroll Navigation (Link di navbar horizontal diarahkan ke dashboardP.php)
-    // Karena ini artikelP.php, link scroll navbar horizontal harus diarahkan ke dashboardP.php
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
       anchor.addEventListener('click', function (e) {
-        // Biarkan link yang menuju ke dashboardP.php/klien, dll. berfungsi normal
-        // Tapi untuk halaman ini, kita nonaktifkan scroll lokal karena artikelP tidak punya section
-        // Pengguna harus kembali ke dashboardP.php untuk scroll.
-        // KODE INI TIDAK MEMBUTUHKAN SMOOTH SCROLL KARENA TIDAK ADA ANCHOR LOKAL
-
-        // Hapus e.preventDefault(); di sini, biarkan browser mengarahkan ke dashboardP.php
       });
     });
 

@@ -3,11 +3,15 @@ session_start();
 
 if (!isset($_SESSION['status']) || $_SESSION['status'] != "login" || $_SESSION['role'] != 'admin') {
   header("location:../login.php?pesan=akses_ditolak");
-  exit(); // Hentikan script jika tidak valid
+  exit();
+}
+$alert_message = '';
+if (isset($_SESSION['alert_message'])) {
+  $alert_message = $_SESSION['alert_message'];
+  unset($_SESSION['alert_message']);
 }
 
-// Ambil username (nama admin) dari session
-$admin_name = $_SESSION['username'];
+$admin_name = $_SESSION['username'] ?? 'admin';
 ?>
 
 <!DOCTYPE html>
@@ -22,8 +26,7 @@ $admin_name = $_SESSION['username'];
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <style>
     .navbar {
-      background-color: #1e3a8a;
-      /* blue-900 */
+      background-color: #11224E;
       color: white;
       display: flex;
       justify-content: space-between;
@@ -39,7 +42,6 @@ $admin_name = $_SESSION['username'];
       display: flex;
       align-items: center;
       gap: 32px;
-      /* Jarak antara logo dan menu */
     }
 
     .nav-link {
@@ -67,7 +69,10 @@ $admin_name = $_SESSION['username'];
       background-color: #f3f4f6;
       font-family: sans-serif;
       margin: 0;
-      /* Hapus margin default browser */
+    }
+
+    h1 {
+      color: #11224E;
     }
   </style>
 </head>
@@ -99,27 +104,42 @@ $admin_name = $_SESSION['username'];
     <main class="p-6 flex-1 overflow-y-auto">
 
       <section id="home" class="h-screen flex flex-col items-start justify-start p-10 bg-white shadow-lg rounded-xl">
-        <h1 class="text-4xl font-extrabold text-blue-900 mb-4">Selamat Datang,
+        <h1 class="text-4xl font-extrabold mb-4">Selamat Datang,
           <?php echo htmlspecialchars($admin_name); ?>!
         </h1>
-        <p class="text-xl text-gray-600">Ini adalah halaman *home* khusus untuk Anda. Anda bisa mulai mengelola konten
-          dari sini.</p>
+        <p class="text-xl text-gray-600">Ini adalah website Admin, silakan mengelola sistem Anda disini.</p>
       </section>
+
+      <?php if (!empty($alert_message)): ?>
+        <div id="successAlert"
+          style="position: fixed; top: 10px; right: 20px; z-index: 1000; background-color: #d1fae5; color: #065f46; padding: 15px 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #10b981; transition: opacity 0.5s ease-out;">
+          <?php echo $alert_message; ?>
+        </div>
+      <?php endif; ?>
 
     </main>
   </div>
   <script>
+    const successAlert = document.getElementById('successAlert');
+
+    if (successAlert) {
+      setTimeout(() => {
+        successAlert.style.opacity = '0';
+      }, 4000);
+
+      setTimeout(() => {
+        successAlert.style.display = 'none';
+      }, 4500);
+    }
+
     // logout
     const logoutBtn = document.getElementById('logoutButton');
 
     if (logoutBtn) {
       logoutBtn.addEventListener('click', function (e) {
-        // Tampilkan popup konfirmasi
         const konfirmasi = confirm("Anda yakin ingin keluar (Logout)?");
 
         if (konfirmasi) {
-          // Jika user menekan 'OK', arahkan ke logout.php
-          // Sesuaikan path ke logout.php jika berbeda
           window.location.href = '../logout.php';
         }
       });

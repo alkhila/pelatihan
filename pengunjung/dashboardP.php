@@ -1,25 +1,21 @@
 <?php
-// pengunjung/dashboardP.php
 session_start();
 
-// Cek status login
 $is_logged_in = isset($_SESSION['status']) && $_SESSION['status'] == "login";
 
-// PENTING: Ambil username secara aman
 $username = $_SESSION['username'] ?? '';
 
-// --- PERBAIKAN DI SINI ---
-// Ambil role secara aman. Jika $_SESSION['role'] belum diset, gunakan default 'pengunjung'.
 $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : 'pengunjung';
 
-// --- LOGIKA REDIRECT YANG BENAR ---
-// Kondisi 1: Jika user sudah login DAN role-nya adalah ADMIN, alihkan ke dashboard admin.
 if ($is_logged_in && $user_role == 'admin') {
   header("location: ../admin/dashboard.php");
   exit();
 }
-// Kondisi 2 (Implicit): Jika bukan admin (yaitu Pengunjung yang login atau Anonim),
-// biarkan sisa script (HTML) berjalan.
+$alert_message = '';
+if (isset($_SESSION['alert_message'])) {
+  $alert_message = $_SESSION['alert_message'];
+  unset($_SESSION['alert_message']);
+}
 ?>
 
 <!DOCTYPE html>
@@ -28,7 +24,7 @@ if ($is_logged_in && $user_role == 'admin') {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DolceVita Cafe</title>
+  <title>Dolhareubang Cafe</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -45,7 +41,7 @@ if ($is_logged_in && $user_role == 'admin') {
 
     /* Styling Sidebar */
     #sidebar {
-      background-color: #1e3a8a;
+      background-color: #11224E;
       color: white;
       height: 100vh;
       min-height: 100vh;
@@ -59,10 +55,8 @@ if ($is_logged_in && $user_role == 'admin') {
       top: 0;
     }
 
-    /* Main Content Container: Tambahkan margin-left untuk menggeser konten dari sidebar */
     #main-content-container {
       margin-left: 256px;
-      /* W-64 */
       transition: margin-left 0.3s;
       flex: 1;
       display: flex;
@@ -70,9 +64,8 @@ if ($is_logged_in && $user_role == 'admin') {
       min-height: 100vh;
     }
 
-    /* Styling Navbar */
     .navbar {
-      background-color: #1e3a8a;
+      background-color: #11224E;
       color: white;
       display: flex;
       justify-content: space-between;
@@ -83,7 +76,6 @@ if ($is_logged_in && $user_role == 'admin') {
       box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
       width: 100%;
       padding: 12px 24px;
-      /* Hapus margin atas/bawah jika ada */
       margin: 0;
     }
 
@@ -114,7 +106,6 @@ if ($is_logged_in && $user_role == 'admin') {
       gap: 32px;
     }
 
-    /* Styling Konten Scroll */
     .h-screen {
       height: 100vh;
     }
@@ -135,8 +126,8 @@ if ($is_logged_in && $user_role == 'admin') {
 
 <body>
 
-  <div id="sidebar" class="bg-blue-900 text-white w-64 h-screen flex flex-col fixed z-20">
-    <div class="flex items-center justify-between p-4 border-b border-blue-800">
+  <div id="sidebar" class="bg-navy-900 text-white w-64 h-screen flex flex-col fixed z-20">
+    <div class="flex items-center justify-between p-4">
       <button id="toggleSidebar"
         style="display: flex; align-items: center; gap: 8px; border: none; background: none; color: inherit;">
         <img src="../img/logo.png" alt="Logo" style="width: 32px; height: 32px; border-radius: 50%;" />
@@ -192,7 +183,7 @@ if ($is_logged_in && $user_role == 'admin') {
           <h2 class="text-6xl font-extrabold tracking-wider">Dolhareubang Cafe, Jeju</h2>
           <p class="mt-4 text-2xl font-light italic">"Kopi terbaik di bawah tatapan sang Kakek Batu."</p>
           <a href="#produk-kami"
-            class="mt-8 inline-block px-8 py-3 bg-pink-600 text-white font-semibold rounded-full hover:bg-pink-700 transition duration-300">
+            class="mt-8 inline-block px-8 py-3 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition duration-300">
             Cicipi Rasa Khas Jeju
           </a>
         </div>
@@ -201,7 +192,7 @@ if ($is_logged_in && $user_role == 'admin') {
       <section id="visi-misi" class="h-screen p-16 bg-gray-100 flex items-center justify-center">
         <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12">
           <div>
-            <h2 class="text-4xl font-bold text-blue-900 mb-6 border-b-2 border-pink-500 pb-2">Visi Kami 🌟</h2>
+            <h2 class="text-4xl font-bold text-blue-900 mb-6 border-b-2 border-orange-500 pb-2">Visi Kami 🌟</h2>
             <p class="text-xl leading-relaxed">
               Menjadi tujuan utama penikmat kopi di Jeju yang menggabungkan cita rasa global dengan keunikan budaya
               dan
@@ -209,7 +200,7 @@ if ($is_logged_in && $user_role == 'admin') {
             </p>
           </div>
           <div>
-            <h2 class="text-4xl font-bold text-blue-900 mb-6 border-b-2 border-pink-500 pb-2">Misi Kami 🎯</h2>
+            <h2 class="text-4xl font-bold text-blue-900 mb-6 border-b-2 border-orange-500 pb-2">Misi Kami 🎯</h2>
             <ul class="list-disc list-inside text-xl space-y-3 pl-4">
               <li>Menyajikan menu dengan bahan baku hasil bumi Jeju (Jeruk Hallabong, Teh Hijau Udo).</li>
               <li>Menciptakan ruang yang menghormati tradisi dan keramahan khas Korea.</li>
@@ -222,7 +213,7 @@ if ($is_logged_in && $user_role == 'admin') {
 
       <section id="produk-kami" class="h-screen p-16 bg-white">
         <h2
-          class="text-5xl font-bold text-center mb-16 text-blue-900 border-b-4 border-pink-500 inline-block mx-auto pb-2">
+          class="text-5xl font-bold text-center mb-16 text-blue-900 border-b-4 border-orange-500 inline-block mx-auto pb-2">
           Signature Jeju: Produk Unggulan 🍊
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 max-w-6xl mx-auto">
@@ -230,22 +221,22 @@ if ($is_logged_in && $user_role == 'admin') {
             <h3 class="text-3xl font-bold mb-6 text-blue-900">Spesial Kopi</h3>
             <ul class="space-y-4">
               <li class="flex justify-between border-b pb-2"><span>Hallabong Cold Brew</span><span
-                  class="font-semibold text-pink-600">₩ 7.500</span></li>
+                  class="font-semibold text-orange-600">₩ 7.500</span></li>
               <li class="flex justify-between border-b pb-2"><span>Udo Peanut Latte</span><span
-                  class="font-semibold text-pink-600">₩ 8.000</span></li>
+                  class="font-semibold text-orange-600">₩ 8.000</span></li>
               <li class="flex justify-between border-b pb-2"><span>Jeju Green Tea Espresso</span><span
-                  class="font-semibold text-pink-600">₩ 7.000</span></li>
+                  class="font-semibold text-orange-600">₩ 7.000</span></li>
             </ul>
           </div>
-          <div class="bg-gray-50 p-8 rounded-xl shadow-lg border-t-4 border-pink-500">
+          <div class="bg-gray-50 p-8 rounded-xl shadow-lg border-t-4 border-orange-500">
             <h3 class="text-3xl font-bold mb-6 text-blue-900">Minuman Lokal</h3>
             <ul class="space-y-4">
               <li class="flex justify-between border-b pb-2"><span>Fresh Hallabong Ade</span><span
-                  class="font-semibold text-pink-600">₩ 6.500</span></li>
+                  class="font-semibold text-orange-600">₩ 6.500</span></li>
               <li class="flex justify-between border-b pb-2"><span>Pure Jeju Matcha</span><span
-                  class="font-semibold text-pink-600">₩ 7.000</span></li>
+                  class="font-semibold text-orange-600">₩ 7.000</span></li>
               <li class="flex justify-between border-b pb-2"><span>Omija Berry Tea (Hot)</span><span
-                  class="font-semibold text-pink-600">₩ 6.000</span></li>
+                  class="font-semibold text-orange-600">₩ 6.000</span></li>
             </ul>
           </div>
           <div class="bg-gray-50 p-8 rounded-xl shadow-lg border-t-4 border-blue-900">
@@ -262,19 +253,18 @@ if ($is_logged_in && $user_role == 'admin') {
         </div>
         <br> <br>
         <!-- opsional -->
-        <a href="produk_kami.php">Lihat produk dan pesan -></a>
       </section>
 
       <section id="kontak" class="h-screen p-16 bg-gray-100">
         <h2
-          class="text-5xl font-bold text-center mb-16 text-blue-900 border-b-4 border-pink-500 inline-block mx-auto pb-2">
+          class="text-5xl font-bold text-center mb-16 text-blue-900 border-b-4 border-orange-500 inline-block mx-auto pb-2">
           Lokasi Kami di Pulau Jeju ⛰️</h2>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-7xl mx-auto">
           <div class="space-y-8 p-6 bg-white rounded-xl shadow-lg">
             <h3 class="text-3xl font-semibold text-blue-900">Hubungi Kami</h3>
             <p class="text-xl">📍 **Alamat:** 12-4 Dolhareubang-ro, Gujwa-eup, Kota Jeju, Jeju-do, Korea Selatan.</p>
-            <p class="text-xl">📞 **Telepon:** <span class="font-bold text-pink-600">+82-64-1234-5678</span></p>
-            <p class="text-xl">📧 **Email:** <span class="font-bold text-pink-600">hello@dolhareubang.kr</span></p>
+            <p class="text-xl">📞 **Telepon:** <span class="font-bold text-orange-600">+82-64-1234-5678</span></p>
+            <p class="text-xl">📧 **Email:** <span class="font-bold text-orange-600">hello@dolhareubang.kr</span></p>
             <h3 class="text-3xl font-semibold text-blue-900 mt-8">Jam Operasional</h3>
             <ul class="text-xl space-y-2">
               <li>Setiap Hari: **09.00 - 21.00 KST**</li>
@@ -302,7 +292,7 @@ if ($is_logged_in && $user_role == 'admin') {
               keramahan,
               dan perlindungan tersebut ke dalam setiap layanan kami.
             </p>
-            <p class="text-xl leading-relaxed font-semibold text-pink-600">
+            <p class="text-xl leading-relaxed font-semibold text-orange-600">
               Kami adalah persinggahan sempurna setelah Anda menjelajahi keindahan UNESCO Global Geopark seperti Gua
               Manjanggul. Mampirlah untuk secangkir kopi yang akan mengisi kembali energi Anda!
             </p>
@@ -312,7 +302,7 @@ if ($is_logged_in && $user_role == 'admin') {
 
       <section id="klien" class="h-screen p-16 bg-gray-50">
         <h2
-          class="text-5xl font-bold text-center mb-16 text-blue-900 border-b-4 border-pink-500 inline-block mx-auto pb-2">
+          class="text-5xl font-bold text-center mb-16 text-blue-900 border-b-4 border-orange-500 inline-block mx-auto pb-2">
           Mitra & Klien Kami 🤝
         </h2>
         <p class="text-center max-w-4xl mx-auto text-xl text-gray-700 mb-12">
@@ -339,22 +329,26 @@ if ($is_logged_in && $user_role == 'admin') {
           </div>
         </div>
       </section>
+
+      <?php if (!empty($alert_message)): ?>
+        <div id="successAlert"
+          style="position: fixed; top: 10px; right: 20px; z-index: 1000; background-color: #d1fae5; color: #065f46; padding: 15px 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #10b981; transition: opacity 0.5s ease-out;">
+          <?php echo $alert_message; ?>
+        </div>
+      <?php endif; ?>
     </main>
   </div>
 
   <script>
-    // Ambil elemen untuk manipulasi
     const toggleSidebar = document.getElementById("toggleSidebar");
     const sidebar = document.getElementById("sidebar");
     const logoText = document.getElementById("logoText");
     const sidebarTexts = document.querySelectorAll(".sidebar-text");
     const mainContentContainer = document.getElementById("main-content-container");
 
-    // Tentukan nilai lebar (w-64 = 256px, w-20 = 80px)
     const lebarSidebarTerbuka = '256px';
     const lebarSidebarTertutup = '80px';
 
-    // Atur margin awal main content agar tidak tertutup sidebar
     mainContentContainer.style.marginLeft = lebarSidebarTerbuka;
 
     // 1. Logic Toggle Sidebar (Diikat ke tombol di sidebar)
@@ -374,7 +368,6 @@ if ($is_logged_in && $user_role == 'admin') {
       });
     }
 
-    // 2. Logic Scroll Navigation (Menyasar link di Sidebar DAN Navbar Horizontal)
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
       anchor.addEventListener('click', function (e) {
         e.preventDefault();
@@ -383,8 +376,6 @@ if ($is_logged_in && $user_role == 'admin') {
         const targetElement = document.querySelector(targetId);
 
         if (targetElement) {
-          // Gunakan scrollIntoView standar (browser akan handle smooth scroll)
-          // Karena CSS trick sudah mengatur offset, kita tidak perlu perhitungan kompleks di JS
           targetElement.scrollIntoView({
             behavior: 'smooth',
             block: 'start'
@@ -409,6 +400,18 @@ if ($is_logged_in && $user_role == 'admin') {
     }
     if (logoutBtnSidebar) {
       logoutBtnSidebar.addEventListener('click', handleLogout);
+    }
+
+    const successAlert = document.getElementById('successAlert');
+
+    if (successAlert) {
+      setTimeout(() => {
+        successAlert.style.opacity = '0';
+      }, 4000);
+
+      setTimeout(() => {
+        successAlert.style.display = 'none';
+      }, 4500);
     }
   </script>
 </body>
