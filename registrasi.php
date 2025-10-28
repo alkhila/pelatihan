@@ -160,6 +160,14 @@ end_script:
     <div class="form-section">
       <form action="" method="post">
         <h1>REGISTER</h1> <br>
+        <?php if (!empty($error)): ?>
+          <div id="regErrorAlert"
+            style="margin-left: 30px; background-color: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; padding: 12px; border-radius: 6px; max-width:88%;">
+            <strong>Gagal:</strong>
+            <span> <?php echo htmlspecialchars($error); ?></span>
+          </div>
+        <?php endif; ?>
+
         <div class="form-group">
           <label for="username">Username</label>
           <input type="text" name="usn">
@@ -186,6 +194,19 @@ end_script:
       <img src="img/logo.png">
     </div>
   </div>
+  <script>
+    // Fade-out for registration error alert
+    const regErrorAlert = document.getElementById('regErrorAlert');
+    if (regErrorAlert) {
+      setTimeout(() => {
+        regErrorAlert.style.opacity = '0';
+        regErrorAlert.style.transition = 'opacity 0.5s ease';
+        setTimeout(() => {
+          regErrorAlert.style.display = 'none';
+        }, 500);
+      }, 5000);
+    }
+  </script>
 </body>
 
 </html>

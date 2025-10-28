@@ -166,6 +166,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <div class="form-section">
       <form action="" method="post">
         <h1>LOGIN</h1> <br>
+        <?php if (!empty($success_message)): ?>
+          <div id="successAlert"
+            style="margin-left: 30px; background-color: #ecfccb; border: 1px solid #bbf7d0; color: #14532d; padding: 12px; border-radius: 6px; max-width:88%;">
+            <strong>Berhasil:</strong>
+            <span> <?php echo htmlspecialchars($success_message); ?></span>
+          </div>
+        <?php endif; ?>
         <?php if (!empty($error)): ?>
           <div id="errorAlert" style="margin-left: 30px;">
             <p class="error-message">⚠️ <?php echo $error; ?></p>
@@ -191,16 +198,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
   <script>
     const errorAlert = document.getElementById('errorAlert');
+    const successAlert = document.getElementById('successAlert');
 
     if (errorAlert) {
       setTimeout(() => {
         errorAlert.style.opacity = '0';
-
+        errorAlert.style.transition = 'opacity 0.5s ease';
         setTimeout(() => {
           errorAlert.style.display = 'none';
         }, 500);
-
       }, 4000);
+    }
+
+    if (successAlert) {
+      setTimeout(() => {
+        successAlert.style.opacity = '0';
+        successAlert.style.transition = 'opacity 0.5s ease';
+        setTimeout(() => {
+          successAlert.style.display = 'none';
+        }, 500);
+      }, 5000);
     }
   </script>
 </body>
