@@ -2,7 +2,6 @@
 include '../config/config.php';
 session_start();
 
-// --- PENGAMANAN & INISIALISASI ---
 if (!isset($_SESSION['status']) || $_SESSION['status'] != "login") {
   header("location:login.php?pesan=belum_login");
   exit();
@@ -11,7 +10,6 @@ if (!isset($_SESSION['status']) || $_SESSION['status'] != "login") {
 $admin_id = isset($_SESSION['id']) ? $_SESSION['id'] : 0;
 $pesan = "";
 
-// Cek apakah ID ada di URL untuk mode EDIT
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
   header("location: artikel.php?pesan=ID artikel tidak valid.");
   exit();
@@ -19,7 +17,6 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 $id_artikel = mysqli_real_escape_string($konek, $_GET['id']);
 
 
-// --- AMBIL DATA DARI DATABASE (Untuk mengisi form) ---
 $query_select = mysqli_query($konek, "SELECT * FROM articles WHERE id='$id_artikel'");
 $data_edit = mysqli_fetch_assoc($query_select);
 
@@ -28,17 +25,12 @@ if (!$data_edit) {
   exit();
 }
 
-// Jika ada POST, prioritaskan data POST agar data yang baru diketik tidak hilang
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  // Gabungkan data POST dengan data lama, agar data DB lama tidak hilang
   $data_edit = array_merge($data_edit, $_POST);
 }
 
 
-// --- LOGIKA PROSES UPDATE ---
 if (isset($_POST['update'])) {
-
-  // Amankan input
   $judul = mysqli_real_escape_string($konek, $_POST['title']);
   $konten = mysqli_real_escape_string($konek, $_POST['content']);
   $kategori = mysqli_real_escape_string($konek, $_POST['category']);
@@ -46,7 +38,6 @@ if (isset($_POST['update'])) {
   $gambar_lama = $_POST['photo_old'];
   $path_foto = $gambar_lama;
 
-  // --- Penanganan Upload Foto ---
   if (isset($_FILES['photo']) && $_FILES['photo']['error'] === 0) {
     $target_dir = "uploads/artikel/";
     if (!is_dir($target_dir))
@@ -62,7 +53,6 @@ if (isset($_POST['update'])) {
     } elseif (move_uploaded_file($_FILES['photo']['tmp_name'], $target_file)) {
       $path_foto = $target_file;
 
-      // Hapus gambar lama
       if (!empty($gambar_lama) && file_exists($gambar_lama)) {
         unlink($gambar_lama);
       }
@@ -72,7 +62,6 @@ if (isset($_POST['update'])) {
     }
   }
 
-  // UPDATE QUERY
   $query = "UPDATE articles SET 
                 title='$judul', 
                 content='$konten', 
@@ -90,7 +79,6 @@ if (isset($_POST['update'])) {
 }
 
 end_script_update:
-// --- LANJUT KE HTML ---
 ?>
 
 <!DOCTYPE html>

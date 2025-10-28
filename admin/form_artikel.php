@@ -1,27 +1,20 @@
 <?php
-// Pastikan path ke config.php sudah benar
 include '../config/config.php';
 session_start();
 
-// PENTING: Ambil admin_id dari sesi. Jika tidak ada sesi, gunakan default atau alihkan ke login.
-// Asumsi: Saat login, Anda menyimpan ID admin di $_SESSION['admin_id'] atau $_SESSION['id']
 $admin_id = isset($_SESSION['id']) ? $_SESSION['id'] : 0;
 
 if (isset($_POST['submit'])) {
-  // 1. Ambil data dari form dan amankan
   $judul = mysqli_real_escape_string($konek, $_POST['title']);
   $konten = mysqli_real_escape_string($konek, $_POST['content']);
   $kategori = mysqli_real_escape_string($konek, $_POST['category']);
 
-  // 2. Siapkan variabel upload gambar (path awal kosong)
   $path_foto = NULL;
   $pesan = "";
 
-  // 3. Handle File Upload (Foto)
   if (isset($_FILES['photo']) && $_FILES['photo']['error'] === 0) {
-    $target_dir = "uploads/artikel/"; // Pastikan folder ini ada dan writable
+    $target_dir = "uploads/artikel/";
 
-    // Buat folder jika belum ada
     if (!is_dir($target_dir)) {
       mkdir($target_dir, 0777, true);
     }
@@ -30,20 +23,16 @@ if (isset($_POST['submit'])) {
     $target_file = $target_dir . $nama_file;
     $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
-    // Cek ekstensi file yang diperbolehkan
     if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg") {
       $pesan = "Maaf, hanya file JPG, JPEG, & PNG yang diperbolehkan.";
     } elseif (move_uploaded_file($_FILES['photo']['tmp_name'], $target_file)) {
-      $path_foto = $target_file; // Simpan path untuk database
+      $path_foto = $target_file;
     } else {
       $pesan = "Maaf, terjadi kesalahan saat mengunggah file.";
     }
   }
 
-  // 4. Lakukan INSERT jika tidak ada error upload fatal
   if (empty($pesan)) {
-    // Query disesuaikan dengan struktur articles: title, content, category, photo, admin_id, published_at
-    // published_at akan otomatis terisi
     $query = "INSERT INTO articles (title, content, category, photo, admin_id) 
                   VALUES ('$judul', '$konten', '$kategori', '$path_foto', '$admin_id')";
 
