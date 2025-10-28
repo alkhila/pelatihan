@@ -11,6 +11,13 @@ $current_admin_id = $_SESSION['id'] ?? 0;
 $admin_name = $_SESSION['username'] ?? 'Admin';
 $pesan = "";
 
+$keyword = '';
+$where_clause = '';
+if (isset($_GET['keyword']) && !empty($_GET['keyword'])) {
+  $keyword = mysqli_real_escape_string($konek, $_GET['keyword']);
+  $where_clause = " WHERE title LIKE '%$keyword%' OR content LIKE '%$keyword%' ";
+}
+
 if (isset($_GET['hapus'])) {
   $id = mysqli_real_escape_string($konek, $_GET['hapus']);
 
@@ -42,6 +49,7 @@ if (isset($_SESSION['notifikasi_pesan'])) {
   unset($_SESSION['notifikasi_pesan']);
 } elseif (isset($_GET['pesan'])) {
   $pesan_notifikasi = urldecode($_GET['pesan']);
+
   if (
     strpos(strtolower($pesan_notifikasi), 'gagal') !== false ||
     strpos(strtolower($pesan_notifikasi), 'tidak bisa') !== false ||
@@ -51,7 +59,10 @@ if (isset($_SESSION['notifikasi_pesan'])) {
   }
 }
 
-$query = "SELECT id, title, category, content, published_at FROM articles ORDER BY published_at DESC";
+$query = "SELECT id, title, category, content, published_at FROM articles"
+  . $where_clause .
+  " ORDER BY published_at DESC";
+
 $data_artikel = mysqli_query($konek, $query);
 ?>
 
@@ -130,6 +141,7 @@ $data_artikel = mysqli_query($konek, $query);
       border-radius: 4px;
       opacity: 1;
       transition: opacity 0.5s ease-out;
+      font-weight: bold;
     }
 
     .alert-success {
@@ -161,15 +173,16 @@ $data_artikel = mysqli_query($konek, $query);
       background-color: #0c1a38;
     }
 
+    .material-icons {
+      font-size: 20px;
+      vertical-align: middle;
+    }
+
     .table-container {
       background-color: white;
       border-radius: 12px;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
       padding: 24px;
-    }
-
-    .table-wrapper {
-      overflow-x: auto;
     }
 
     .data-table {
@@ -200,9 +213,25 @@ $data_artikel = mysqli_query($konek, $query);
       white-space: nowrap;
     }
 
+    .td-title {
+      font-weight: 500;
+      max-width: 300px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
     .td-category {
       color: #11224E;
       font-weight: 600;
+    }
+
+    .td-content {
+      color: #6b7280;
+      max-width: 400px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .action-link a.edit {
@@ -214,9 +243,11 @@ $data_artikel = mysqli_query($konek, $query);
       color: #dc2626;
     }
 
-    .material-icons {
-      font-size: 20px;
-      vertical-align: middle;
+    .no-data {
+      padding: 40px;
+      text-align: center;
+      color: #6b7280;
+      font-size: 18px;
     }
   </style>
 </head>
@@ -247,6 +278,7 @@ $data_artikel = mysqli_query($konek, $query);
 
   <div class="content-area-wrapper">
     <h1 class="page-title">Manajemen Artikel</h1>
+
     <?php
     if (!empty($pesan_notifikasi)) {
       $alert_class = $is_error ? 'alert-error' : 'alert-success';
@@ -256,7 +288,21 @@ $data_artikel = mysqli_query($konek, $query);
     }
     ?>
 
-    <div style="margin-bottom: 24px; display: flex; justify-content: flex-end;">
+    <div style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;">
+
+      <form action="artikel.php" method="GET" style="display: flex; gap: 10px;">
+        <input type="text" name="keyword" placeholder="Cari Judul atau Konten..."
+          value="<?php echo htmlspecialchars($keyword); ?>"
+          style="padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; width: 300px;">
+        <button type="submit"
+          style="background-color: #6b7280; color: white; padding: 8px 12px; border-radius: 4px; border: none; cursor: pointer;">
+          <i class="fas fa-search"></i> Cari
+        </button>
+        <?php if (!empty($_GET['keyword'])): ?>
+          <a href="artikel.php" style="padding: 8px; color: #dc2626; text-decoration: none; font-weight: bold;">Reset</a>
+        <?php endif; ?>
+      </form>
+
       <a href="form_artikel.php" class="btn-add">
         <span class="material-icons">add_circle</span> Tambah Artikel
       </a>
@@ -300,7 +346,9 @@ $data_artikel = mysqli_query($konek, $query);
               <?php }
             else: ?>
               <tr>
-                <td colspan="6" class="no-data">Belum ada artikel yang tersedia.</td>
+                <td colspan="6" class="no-data">
+                  <?php echo !empty($keyword) ? "Tidak ditemukan artikel untuk kata kunci: " . htmlspecialchars($keyword) : "Belum ada artikel yang tersedia."; ?>
+                </td>
               </tr>
             <?php endif; ?>
           </tbody>

@@ -2,22 +2,18 @@
 include '../config/config.php';
 session_start();
 
-// --- PENGAMANAN KHUSUS ADMIN ---
 if (!isset($_SESSION['status']) || $_SESSION['status'] != "login" || $_SESSION['role'] != 'admin') {
   header("location:../login.php?pesan=akses_ditolak");
-  exit(); // Hentikan script jika tidak valid
+  exit();
 }
 
 $current_admin_id = $_SESSION['id'];
 $admin_name = $_SESSION['username'];
 $pesan = "";
 
-// Baris 16
-// --- LOGIKA HAPUS USER ---
 if (isset($_GET['hapus'])) {
   $id_hapus = mysqli_real_escape_string($konek, $_GET['hapus']);
 
-  // Periksa: Pastikan admin TIDAK menghapus dirinya sendiri
   if ($id_hapus != $current_admin_id) {
     $hapus = mysqli_query($konek, "DELETE FROM users WHERE id='$id_hapus'");
     if ($hapus) {
@@ -32,12 +28,10 @@ if (isset($_GET['hapus'])) {
   exit();
 }
 
-// --- LOGIKA UBAH ROLE ---
 if (isset($_POST['ubah_role'])) {
   $id_ubah = mysqli_real_escape_string($konek, $_POST['id_user']);
   $role_baru = mysqli_real_escape_string($konek, $_POST['role_baru']);
 
-  // Periksa: Pastikan admin TIDAK mengubah role akunnya sendiri
   if ($id_ubah != $current_admin_id) {
     $update = mysqli_query($konek, "UPDATE users SET role='$role_baru' WHERE id='$id_ubah'");
     if ($update) {
@@ -52,7 +46,6 @@ if (isset($_POST['ubah_role'])) {
   exit();
 }
 
-// --- LOGIKA READ USER ---
 $query = "SELECT id, name, email, role FROM users ORDER BY role DESC, name";
 $data_users = mysqli_query($konek, $query);
 ?>
@@ -67,7 +60,6 @@ $data_users = mysqli_query($konek, $query);
   <style>
     .navbar {
       background-color: #11224E;
-      /* blue-900 */
       color: white;
       display: flex;
       justify-content: space-between;
@@ -83,7 +75,6 @@ $data_users = mysqli_query($konek, $query);
       display: flex;
       align-items: center;
       gap: 32px;
-      /* Jarak antara logo dan menu */
     }
 
     .nav-link {
@@ -111,13 +102,11 @@ $data_users = mysqli_query($konek, $query);
       background-color: #f3f4f6;
       font-family: sans-serif;
       margin: 0;
-      /* Hapus margin default browser */
     }
 
     .content-area-wrapper {
       max-width: 1200px;
       margin-left: auto;
-      /* Pusatkan konten */
       margin-right: auto;
       padding: 32px 48px;
     }
@@ -128,7 +117,6 @@ $data_users = mysqli_query($konek, $query);
       color: #1f2937;
       margin-bottom: 24px;
       padding-bottom: 8px;
-      /* Pusatkan judul di dalam content-area-wrapper */
       text-align: center;
     }
 
@@ -177,8 +165,6 @@ $data_users = mysqli_query($konek, $query);
       background-color: #fffacd;
       font-weight: bold;
     }
-
-    /* Menandai user yang sedang login */
   </style>
 </head>
 
@@ -209,7 +195,6 @@ $data_users = mysqli_query($konek, $query);
 
     <?php
     if (isset($_GET['pesan']) && $_GET['pesan'] != '') {
-      // Styling untuk pesan sukses/warning (asumsi warna hijau/merah)
       $msg = htmlspecialchars($_GET['pesan']);
       $color = (strpos($msg, 'gagal') !== false || strpos($msg, 'tidak bisa') !== false) ? 'red' : 'green';
 
@@ -270,7 +255,6 @@ $data_users = mysqli_query($konek, $query);
   </div>
 
   <script>
-    // Logic Logout Confirmation
     const logoutBtn = document.getElementById('logoutButton');
 
     if (logoutBtn) {
@@ -278,27 +262,22 @@ $data_users = mysqli_query($konek, $query);
         const konfirmasi = confirm("Anda yakin ingin keluar (Logout)?");
 
         if (konfirmasi) {
-          // Path ke logout.php harus keluar dari folder admin
           window.location.href = '../logout.php';
         }
       });
     }
 
-    // --- FUNGSI TIMER UNTUK NOTIFIKASI ---
     const statusMessage = document.getElementById('statusMessage');
 
     if (statusMessage) {
-      // Durasi tampilan: 4000 milidetik (4 detik)
       setTimeout(() => {
-        // Memulai transisi fade out (membuat opacity jadi 0)
         statusMessage.style.opacity = '0';
 
-        // Setelah transisi (0.5 detik), sembunyikan sepenuhnya
         setTimeout(() => {
           statusMessage.style.display = 'none';
         }, 500);
 
-      }, 4000); // Pesan akan menghilang setelah 4 detik
+      }, 4000);
     }
   </script>
 </body>

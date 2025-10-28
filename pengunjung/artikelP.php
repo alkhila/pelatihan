@@ -12,10 +12,18 @@ if ($is_logged_in && $user_role == 'admin') {
   exit();
 }
 
+$keyword = '';
+$where_clause = '';
+if (isset($_GET['keyword']) && !empty($_GET['keyword'])) {
+  $keyword = mysqli_real_escape_string($konek, $_GET['keyword']);
+  $where_clause = " WHERE a.title LIKE '%$keyword%' OR a.content LIKE '%$keyword%' ";
+}
+
 $query = "SELECT a.id, a.title, a.content, a.category, a.photo, a.published_at, u.name AS author_name 
           FROM articles a
-          JOIN users u ON a.admin_id = u.id 
-          ORDER BY a.published_at DESC";
+          JOIN users u ON a.admin_id = u.id "
+  . $where_clause .
+  " ORDER BY a.published_at DESC";
 
 $artikel_result = mysqli_query($konek, $query);
 $articles = [];
@@ -274,6 +282,21 @@ if ($artikel_result) {
 
     <main class="flex-1 overflow-y-auto">
       <h1 class="page-title">Artikel Terbaru Dolhareubang Cafe</h1>
+      <div style="text-align: center; margin-bottom: 30px;">
+        <form action="artikelP.php" method="GET" style="display: inline-flex; gap: 10px;">
+          <input type="text" name="keyword" placeholder="Cari Artikel..."
+            value="<?php echo htmlspecialchars($keyword); ?>"
+            style="padding: 10px 15px; border: 1px solid black; background-color: white; color: black; border-radius: 6px; width: 400px;">
+          <button type="submit"
+            style="background-color: #2563eb; color: white; padding: 10px 15px; border-radius: 6px; border: none; cursor: pointer;">
+            <i class="fas fa-search"></i>
+          </button>
+          <?php if (!empty($_GET['keyword'])): ?>
+            <a href="artikelP.php"
+              style="background-color: #dc2626; color: white; padding: 10px 15px; border-radius: 6px; text-decoration: none;">Reset</a>
+          <?php endif; ?>
+        </form>
+      </div>
       <div class="card-grid">
         <?php if (empty($articles)): ?>
           <p style="text-align: center; grid-column: 1 / -1; color: #8b949e;">Belum ada artikel yang dipublikasikan.</p>
