@@ -121,7 +121,6 @@ $admin_name = $_SESSION['username'] ?? 'admin';
   </div>
   <script>
     const successAlert = document.getElementById('successAlert');
-
     if (successAlert) {
       setTimeout(() => {
         successAlert.style.opacity = '0';
@@ -132,9 +131,7 @@ $admin_name = $_SESSION['username'] ?? 'admin';
       }, 4500);
     }
 
-    // logout
     const logoutBtn = document.getElementById('logoutButton');
-
     if (logoutBtn) {
       logoutBtn.addEventListener('click', function (e) {
         const konfirmasi = confirm("Anda yakin ingin keluar (Logout)?");

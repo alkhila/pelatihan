@@ -46,7 +46,7 @@ end_script:
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login</title>
+  <title>Registrasi Dolhareubang Cafe</title>
   <style>
     body {
       margin: 0;
@@ -195,7 +195,6 @@ end_script:
     </div>
   </div>
   <script>
-    // Fade-out for registration error alert
     const regErrorAlert = document.getElementById('regErrorAlert');
     if (regErrorAlert) {
       setTimeout(() => {

@@ -59,9 +59,11 @@ if (isset($_SESSION['notifikasi_pesan'])) {
   }
 }
 
-$query = "SELECT id, title, category, content, published_at FROM articles"
+$query = "SELECT a.id, a.title, a.content, a.category, a.photo, a.published_at, u.name AS author_name 
+          FROM articles a
+          JOIN users u ON a.admin_id = u.id "
   . $where_clause .
-  " ORDER BY published_at DESC";
+  " ORDER BY a.published_at DESC";
 
 $data_artikel = mysqli_query($konek, $query);
 ?>
@@ -72,7 +74,7 @@ $data_artikel = mysqli_query($konek, $query);
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Manajemen Artikel</title>
+  <title>Manajemen Artikel | Dolhareubang</title>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
@@ -183,12 +185,14 @@ $data_artikel = mysqli_query($konek, $query);
       border-radius: 12px;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
       padding: 24px;
+      overflow-x: auto;
     }
 
     .data-table {
       min-width: 100%;
       border-collapse: collapse;
       border: 1px solid #e5e7eb;
+      table-layout: fixed;
     }
 
     .table-header {
@@ -210,6 +214,16 @@ $data_artikel = mysqli_query($konek, $query);
       font-size: 14px;
       color: #1f2937;
       border-bottom: 1px solid #e5e7eb;
+      white-space: normal;
+      word-wrap: break-word;
+      overflow-wrap: anywhere;
+    }
+
+    .data-table th:first-child,
+    .data-table td:first-child {
+      width: 70px;
+      max-width: 90px;
+      text-align: center;
       white-space: nowrap;
     }
 
@@ -241,6 +255,33 @@ $data_artikel = mysqli_query($konek, $query);
 
     .action-link a.delete {
       color: #dc2626;
+    }
+
+    .action-link {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+    }
+
+    .action-link a {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 14px;
+      transition: background-color 0.12s ease;
+    }
+
+    .action-link a.edit:hover {
+      background-color: rgba(217, 119, 6, 0.08);
+    }
+
+    .action-link a.delete:hover {
+      background-color: rgba(220, 38, 38, 0.08);
     }
 
     .no-data {
@@ -317,27 +358,31 @@ $data_artikel = mysqli_query($konek, $query);
               <th>Title</th>
               <th>Kategori</th>
               <th>Content Preview</th>
+              <th>Penulis</th>
               <th>Published At</th>
               <th style="text-align: center;">Aksi</th>
             </tr>
           </thead>
           <tbody class="table-body">
             <?php
-            if (mysqli_num_rows($data_artikel) > 0):
-              while ($data = mysqli_fetch_array($data_artikel)) { ?>
+            if ($data_artikel && mysqli_num_rows($data_artikel) > 0):
+              while ($data = mysqli_fetch_assoc($data_artikel)) { ?>
                 <tr>
                   <td><?php echo $data['id']; ?></td>
-                  <td class="td-title"><?php echo $data['title']; ?></td>
-                  <td class="td-category"><?php echo $data['category']; ?></td>
-                  <td class="td-content"><?php echo substr($data['content'], 0, 70) . '...'; ?></td>
-                  <td><?php echo date('d M Y H:i', strtotime($data['published_at'])); ?></td>
+                  <td class="td-title"><?php echo htmlspecialchars($data['title']); ?></td>
+                  <td class="td-category"><?php echo htmlspecialchars($data['category']); ?></td>
+                  <td class="td-content"><?php echo htmlspecialchars(substr($data['content'], 0, 70)) . '...'; ?></td>
+                  <td class="td-autor"><?php echo htmlspecialchars($data['author_name']); ?></td>
+                  <td>
+                    <?php echo !empty($data['published_at']) ? date('d M Y H:i', strtotime($data['published_at'])) : '-'; ?>
+                  </td>
 
                   <td class="action-link">
                     <a href="edit_artikel.php?id=<?php echo $data['id']; ?>" class="edit">
                       <span class="material-icons">edit</span>
                     </a>
                     <a href="?hapus=<?php echo $data['id']; ?>"
-                      onclick="return confirm('Yakin ingin menghapus artikel: <?php echo $data['title']; ?>?')"
+                      onclick="return confirm('Yakin ingin menghapus artikel: <?php echo htmlspecialchars(addslashes($data['title'])); ?>?')"
                       class="delete">
                       <span class="material-icons">delete</span>
                     </a>
@@ -346,7 +391,7 @@ $data_artikel = mysqli_query($konek, $query);
               <?php }
             else: ?>
               <tr>
-                <td colspan="6" class="no-data">
+                <td colspan="7" class="no-data">
                   <?php echo !empty($keyword) ? "Tidak ditemukan artikel untuk kata kunci: " . htmlspecialchars($keyword) : "Belum ada artikel yang tersedia."; ?>
                 </td>
               </tr>

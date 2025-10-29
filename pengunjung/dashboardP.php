@@ -29,24 +29,19 @@ if (isset($_SESSION['alert_message'])) {
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <style>
-    /* CSS Umum */
     html,
     body {
-      /* Hapus semua margin/padding bawaan browser */
       margin: 0;
       padding: 0;
-      /* Pastikan elemen body tidak memiliki spasi di sekitarnya */
       height: 100%;
     }
 
-    /* Styling Sidebar */
     #sidebar {
       background-color: #11224E;
       color: white;
       height: 100vh;
       min-height: 100vh;
       width: 256px;
-      /* W-64 default */
       position: fixed;
       z-index: 20;
       transition: width 0.3s;
@@ -252,7 +247,7 @@ if (isset($_SESSION['alert_message'])) {
           </div>
         </div>
         <br> <br>
-        <!-- opsional -->
+        \
       </section>
 
       <section id="kontak" class="h-screen p-16 bg-gray-100">
@@ -350,8 +345,6 @@ if (isset($_SESSION['alert_message'])) {
     const lebarSidebarTertutup = '80px';
 
     mainContentContainer.style.marginLeft = lebarSidebarTerbuka;
-
-    // 1. Logic Toggle Sidebar (Diikat ke tombol di sidebar)
     if (toggleSidebar) {
       toggleSidebar.addEventListener("click", () => {
 
@@ -384,7 +377,6 @@ if (isset($_SESSION['alert_message'])) {
       });
     });
 
-    // 3. Logic Logout Confirmation (untuk tombol di Sidebar dan Navbar)
     const handleLogout = () => {
       const konfirmasi = confirm("Anda yakin ingin keluar (Logout)?");
       if (konfirmasi) {
@@ -403,7 +395,6 @@ if (isset($_SESSION['alert_message'])) {
     }
 
     const successAlert = document.getElementById('successAlert');
-
     if (successAlert) {
       setTimeout(() => {
         successAlert.style.opacity = '0';
